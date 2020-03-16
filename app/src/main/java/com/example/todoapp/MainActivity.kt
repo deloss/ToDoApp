@@ -7,6 +7,9 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -15,10 +18,19 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var tareaAdapter : TareaAdapter
 
+    lateinit var tareaDao : TareaDao
+
+    val compositeDisposable = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        tareaDao = TareaDB.getInstance(this).tareaDao()
+
+        compositeDisposable.add(tareaDao.getTareas().subscribeOn(Schedulers.io()).subscribe {
+            tareaAdapter.setTareas(ArrayList(it))
+        })
 
         tareaAdapter = TareaAdapter()
         recycler_view.adapter = tareaAdapter
@@ -37,8 +49,14 @@ class MainActivity : AppCompatActivity() {
                 val tareaDescripcion = data!!.extras!!["tarea"] as String
                 val tareaCreada = Tarea(tareaDescripcion, false)
                 tareaAdapter.agregarTarea(tareaCreada)
+                compositeDisposable.add(tareaDao.insertarTarea(tareaCreada).subscribeOn(Schedulers.io()).subscribe())
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.clear()
     }
 
 }
