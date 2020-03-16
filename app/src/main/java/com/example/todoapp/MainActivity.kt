@@ -15,10 +15,10 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var tareaAdapter : TareaAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         tareaAdapter = TareaAdapter()
         recycler_view.adapter = tareaAdapter
