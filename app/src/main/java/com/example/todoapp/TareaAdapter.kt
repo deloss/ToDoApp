@@ -22,6 +22,27 @@ class TareaAdapter(private var tareas: ArrayList<Tarea> = ArrayList()) : Recycle
         notifyDataSetChanged()
     }
 
+    fun getTarea(posicion: Int) : Tarea {
+        return tareas[posicion]
+    }
+
+    fun eliminarTarea(posicion: Int) {
+        tareas.removeAt(posicion)
+        notifyItemRemoved(posicion)
+    }
+
+    fun restaurarTarea(posicion: Int, tarea: Tarea) {
+        tareas.add(posicion, tarea)
+        notifyItemInserted(posicion)
+    }
+
+    fun cambiarPosicionItem(posicionInicial: Int, posicionFinal: Int) {
+        val tarea = tareas[posicionInicial]
+        tareas.removeAt(posicionInicial)
+        tareas.add(posicionFinal, tarea)
+        notifyItemMoved(posicionInicial, posicionFinal)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TareaViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.tarea_item, parent, false)
